@@ -49,9 +49,19 @@ class GoogleDriveImageUploaderBlock(Block):
             response = drive_service.files().list(q=query).execute()
             files = response.get("files", [])
 
+            query2 = f"'{input_data.folder_id}' in parents"
+            response2 = drive_service.files().list(q=query2).execute()
+            all_files = response2.get("files", [])
+
+            non_image_files = [file.get("name") for file in all_files if not file.get("mimeType", "").startswith("image/")]
+
             if not files:
-                yield "error", "No image files found in the specified folder."
+                yield "error", f"No image files found in the specified folder. wahh. alle files: {all_files}"
                 return
+
+            # if not files:
+            #     yield "error", "No image files found in the specified folder." 
+            #     return
 
             # Download and store each image
             stored_files = []
